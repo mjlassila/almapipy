@@ -484,18 +484,12 @@ class SubClientAcquistionsPurchaseRequests(Client):
     def get(self, purchase_request_id=None, status='ALL', review_status='ALL',
             query={}, limit=10, offset=0, all_records=False,
             q_params={}, raw=False):
-        """Retrieve a list or a single license.
+        """Retrieve a list or a single purchase request.
 
         Args:
             purchase_request_id (str): The purchase request ID.
             format (str): Format. Possible values are according to PR_RequestedFormat code table.
             status (str): Valid values are according to PurchaseRequestStatus code table
-            review_status (str): alid values are ALL, and the listed values in LicenseReviewStatuses code table
-            query (dict): Search query for filtering licenses. Optional.
-                Searching for words from fields: [name, code, licensor].
-                Only AND operator is supported for multiple filters.
-                Format {'field': 'value', 'field2', 'value2'}.
-                e.g. query = {'name': 'license_name'}
             limit (int): Limits the number of results.
                 Valid values are 0-100.
             offset (int): The row number to start with.
@@ -525,19 +519,18 @@ class SubClientAcquistionsPurchaseRequests(Client):
             args['limit'] = limit
             args['offset'] = int(offset)
             args['status'] = str(status)
-            args['review_status'] = str(review_status)
 
             # add search query if specified in desired format
             if query:
                 args['q'] = self.__format_query__(query)
 
         response = self.read(url, args, raw=raw)
-        if license_id:
+        if purchase_request_id:
             return response
 
         # make multiple api calls until all records are retrieved
         if all_records:
             response = self.__read_all__(url=url, args=args, raw=raw,
-                                         response=response, data_key='license')
+                                         response=response, data_key='purchase_request')
         return response
 
