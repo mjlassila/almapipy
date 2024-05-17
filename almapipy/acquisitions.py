@@ -27,6 +27,7 @@ class SubClientAcquistions(Client):
         self.vendors = SubClientAcquistionsVendors(self.cnxn_params)
         self.invoices = SubClientAcquistionsInvoices(self.cnxn_params)
         self.licenses = SubClientAcquistionsLicenses(self.cnxn_params)
+        self.purchase_requests = SubClientAcquistionsPurchaseRequests(self.cnxn_params)
 
 
 class SubClientAcquistionsFunds(Client):
@@ -471,3 +472,72 @@ class SubClientAcquistionsLicenses(Client):
 
         response = self.read(url, args, raw=raw)
         return response
+
+class SubClientAcquistionsPurchaseRequests(Client):
+    """Handles the Purchase Request endpoints of Acquisitions API"""
+
+    def __init__(self, cnxn_params={}):
+        self.cnxn_params = cnxn_params.copy()
+        self.cnxn_params['api_uri'] += '/purchase-requests'
+        self.cnxn_params['api_uri_full'] += '/purchase-requests'
+
+    def get(self, purchase_request_id=None, status='ALL', review_status='ALL',
+            query={}, limit=10, offset=0, all_records=False,
+            q_params={}, raw=False):
+        """Retrieve a list or a single license.
+
+        Args:
+            purchase_request_id (str): The purchase request ID.
+            format (str): Format. Possible values are according to PR_RequestedFormat code table.
+            status (str): Valid values are according to PurchaseRequestStatus code table
+            review_status (str): alid values are ALL, and the listed values in LicenseReviewStatuses code table
+            query (dict): Search query for filtering licenses. Optional.
+                Searching for words from fields: [name, code, licensor].
+                Only AND operator is supported for multiple filters.
+                Format {'field': 'value', 'field2', 'value2'}.
+                e.g. query = {'name': 'license_name'}
+            limit (int): Limits the number of results.
+                Valid values are 0-100.
+            offset (int): The row number to start with.
+            all_records (bool): Return all rows returned by query.
+                Otherwise returns number specified by limit.
+            q_params (dict): Any additional query parameters.
+            raw (bool): If true, returns raw requests object.
+
+        Returns:
+            List of purchase requests or a specific purchase request.
+
+        """
+        args = q_params.copy()
+        args['apikey'] = self.cnxn_params['api_key']
+
+        url = self.cnxn_params['api_uri_full']
+        if purchase_request_id:
+            url += ("/" + str(purchase_request_id))
+        else:
+            # include paramets specific to user list
+            if int(limit) > 100:
+                limit = 100
+            elif int(limit) < 1:
+                limit = 1
+            else:
+                limit = int(limit)
+            args['limit'] = limit
+            args['offset'] = int(offset)
+            args['status'] = str(status)
+            args['review_status'] = str(review_status)
+
+            # add search query if specified in desired format
+            if query:
+                args['q'] = self.__format_query__(query)
+
+        response = self.read(url, args, raw=raw)
+        if license_id:
+            return response
+
+        # make multiple api calls until all records are retrieved
+        if all_records:
+            response = self.__read_all__(url=url, args=args, raw=raw,
+                                         response=response, data_key='license')
+        return response
+
