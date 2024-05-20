@@ -481,21 +481,24 @@ class SubClientAcquistionsPurchaseRequests(Client):
         self.cnxn_params['api_uri'] += '/purchase-requests'
         self.cnxn_params['api_uri_full'] += '/purchase-requests'
 
-    def get(self, purchase_request_id=None, status='ALL', review_status='ALL',
-            query={}, limit=10, offset=0, all_records=False,
-            q_params={}, raw=False):
+    def get(self, purchase_request_id=None, status=None, citation_type=None,
+            owning_library = None, limit=10, offset=0, all_records=False,
+            raw=False):
         """Retrieve a list or a single purchase request.
 
         Args:
             purchase_request_id (str): The purchase request ID.
             format (str): Format. Possible values are according to PR_RequestedFormat code table.
+            owning_library (str): By default purchase requests of all libraries will be returned. 
+                Possible values are valid library values.
             status (str): Valid values are according to PurchaseRequestStatus code table
+            citation_type (str): By default purchase requests of all citation types will be returned. 
+                Possible values are according to PR_CitationType code table.
             limit (int): Limits the number of results.
                 Valid values are 0-100.
             offset (int): The row number to start with.
             all_records (bool): Return all rows returned by query.
                 Otherwise returns number specified by limit.
-            q_params (dict): Any additional query parameters.
             raw (bool): If true, returns raw requests object.
 
         Returns:
@@ -518,11 +521,14 @@ class SubClientAcquistionsPurchaseRequests(Client):
                 limit = int(limit)
             args['limit'] = limit
             args['offset'] = int(offset)
-            args['status'] = str(status)
-
-            # add search query if specified in desired format
-            if query:
-                args['q'] = self.__format_query__(query)
+            if status:
+                args['status'] = str(status)
+            if format:
+                args['format'] = str(format)
+            if owning_library:
+                args['owning_library'] = str(owning_library)
+            if citation_type:
+                args['citation_type'] = str(citation_type)
 
         response = self.read(url, args, raw=raw)
         if purchase_request_id:
@@ -533,4 +539,4 @@ class SubClientAcquistionsPurchaseRequests(Client):
             response = self.__read_all__(url=url, args=args, raw=raw,
                                          response=response, data_key='purchase_request')
         return response
-
+        
