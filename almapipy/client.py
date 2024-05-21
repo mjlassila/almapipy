@@ -112,6 +112,18 @@ class Client(object):
 
         return content
 
+    
+    def delete(self, url, args, raw = False):
+        # Send a delete request
+        response = requests.delete(url, params=args)
+        if raw:
+            return response
+
+        # Parse response
+        content = self.__parse_response__(response)
+
+        return content
+    
     def __format_query__(self, query):
         """Converts dictionary of brief search query to a formated string.
         https://developers.exlibrisgroup.com/blog/How-we-re-building-APIs-at-Ex-Libris#BriefSearch
