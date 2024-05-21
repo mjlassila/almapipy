@@ -59,7 +59,7 @@ class AlmaCnxn(Client):
         if data_format not in ['json', 'xml']:
             message = "Format argument must be either 'json' or 'xml'"
             raise utils.ArgError(message)
-        self.cnxn_params['format'] = data_format
+        self.cnxn_params['data_format'] = data_format
         ns = {'header': 'http://com/exlibris/urm/general/xmlbeans'}
         self.cnxn_params['xml_ns'] = ns
 
@@ -123,7 +123,7 @@ class PrimoCnxn(Client):
         if data_format not in ['json', 'xml']:
             message = "Format argument must be either 'json' or 'xml'"
             raise utils.ArgError(message)
-        self.cnxn_params['format'] = data_format
+        self.cnxn_params['data_format'] = data_format
         ns = {'header': 'http://com/exlibris/urm/general/xmlbeans'}
         self.cnxn_params['xml_ns'] = ns
 

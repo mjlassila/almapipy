@@ -63,6 +63,11 @@ class SubClientAcquistionsFunds(Client):
         args['limit'] = limit
         args['offset'] = int(offset)
 
+        headers = {}
+        headers[
+
+        if 
+
         if library:
             args['library'] = str(library)
 
@@ -71,7 +76,7 @@ class SubClientAcquistionsFunds(Client):
         # make multiple api calls until all records are retrieved
         if all_records:
             response = self.__read_all__(url=url, args=args, raw=raw,
-                                         response=response, data_key='fund')
+                                         headers = headers, response=response, data_key='fund')
         return response
 
 
@@ -480,15 +485,16 @@ class SubClientAcquistionsPurchaseRequests(Client):
         self.cnxn_params = cnxn_params.copy()
         self.cnxn_params['api_uri'] += '/purchase-requests'
         self.cnxn_params['api_uri_full'] += '/purchase-requests'
+        self.cnxn_params['data_format'] = 'json'
 
-    def get(self, purchase_request_id=None, status=None, citation_type=None,
+    def get(self, purchase_request_id=None, request_format=None, status=None, citation_type=None,
             owning_library = None, limit=10, offset=0, all_records=False,
-            raw=False):
+            q_params = {}, raw=False):
         """Retrieve a list or a single purchase request.
 
         Args:
             purchase_request_id (str): The purchase request ID.
-            format (str): Format. Possible values are according to PR_RequestedFormat code table.
+            request_format (str): Purchase request format (E or P).
             owning_library (str): By default purchase requests of all libraries will be returned. 
                 Possible values are valid library values.
             status (str): Valid values are according to PurchaseRequestStatus code table
@@ -499,6 +505,7 @@ class SubClientAcquistionsPurchaseRequests(Client):
             offset (int): The row number to start with.
             all_records (bool): Return all rows returned by query.
                 Otherwise returns number specified by limit.
+            q_params (dict): Any additional query parameters.
             raw (bool): If true, returns raw requests object.
 
         Returns:
@@ -507,7 +514,6 @@ class SubClientAcquistionsPurchaseRequests(Client):
         """
         args = q_params.copy()
         args['apikey'] = self.cnxn_params['api_key']
-
         url = self.cnxn_params['api_uri_full']
         if purchase_request_id:
             url += ("/" + str(purchase_request_id))
@@ -523,12 +529,12 @@ class SubClientAcquistionsPurchaseRequests(Client):
             args['offset'] = int(offset)
             if status:
                 args['status'] = str(status)
-            if format:
-                args['format'] = str(format)
             if owning_library:
                 args['owning_library'] = str(owning_library)
             if citation_type:
                 args['citation_type'] = str(citation_type)
+            if request_format:
+                args['format'] = str(request_format)
 
         response = self.read(url, args, raw=raw)
         if purchase_request_id:

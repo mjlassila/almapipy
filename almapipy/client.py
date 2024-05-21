@@ -38,16 +38,16 @@ class Client(object):
         # Determine format of data to be posted according to order of importance:
         # 1) Local declaration, 2) dtype of data parameter, 3) global setting.
         headers = {}
-        if 'format' not in args.keys():
+        if 'data_format' not in args.keys():
             if type(data) == ET or type(data) == ET.Element:
                 content_type = 'xml'
             elif type(data) == dict:
                 content_type = 'json'
             else:
-                content_type = self.cnxn_params['format']
-            args['format'] = self.cnxn_params['format']
+                content_type = self.cnxn_params['data_format']
+            # args['format'] = self.cnxn_params['data_format']
         else:
-            content_type = args['format']
+            content_type = args['data_format']
 
         # Declare data type in header, convert to string if necessary.
         if content_type == 'json':
@@ -88,14 +88,22 @@ class Client(object):
         """
         # print(url)
 
-        # handle data format. Allow for overriding of global setting.
-        data_format = self.cnxn_params['format']
-        if 'format' not in args.keys():
-            args['format'] = data_format
-        data_format = args['format']
+        headers = {}
+      
+        content_type = self.cnxn_params['data_format']
+           
+
+        # Declare data type in header, convert to string if necessary.
+        if content_type == 'json':
+            headers['accept'] = 'application/json'
+        elif content_type == 'xml':
+            headers['accept'] = 'application/xml'
+        else:
+            headers['accept'] = 'application/json'
+        
 
         # Send request.
-        response = requests.get(url, params=args)
+        response = requests.get(url, params=args, headers=headers)
         if raw:
             return response
 
