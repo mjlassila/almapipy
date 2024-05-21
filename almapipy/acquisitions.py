@@ -63,11 +63,6 @@ class SubClientAcquistionsFunds(Client):
         args['limit'] = limit
         args['offset'] = int(offset)
 
-        headers = {}
-        headers[
-
-        if 
-
         if library:
             args['library'] = str(library)
 
@@ -485,7 +480,6 @@ class SubClientAcquistionsPurchaseRequests(Client):
         self.cnxn_params = cnxn_params.copy()
         self.cnxn_params['api_uri'] += '/purchase-requests'
         self.cnxn_params['api_uri_full'] += '/purchase-requests'
-        self.cnxn_params['data_format'] = 'json'
 
     def get(self, purchase_request_id=None, request_format=None, status=None, citation_type=None,
             owning_library = None, limit=10, offset=0, all_records=False,
@@ -543,6 +537,6 @@ class SubClientAcquistionsPurchaseRequests(Client):
         # make multiple api calls until all records are retrieved
         if all_records:
             response = self.__read_all__(url=url, args=args, raw=raw,
-                                         response=response, data_key='purchase_request')
+                                         response=response, data_key='purchase_requests')
         return response
         
